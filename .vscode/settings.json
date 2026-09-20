@@ -1,5 +1,6 @@
 {
     "chat.tools.terminal.autoApprove": {
-        "/Users/jens/Develop/mcp-dicom/.venv/bin/python": true
+        "/Users/jens/Develop/mcp-dicom/.venv/bin/python": true,
+        "./run_tests.sh": true
     }
 }

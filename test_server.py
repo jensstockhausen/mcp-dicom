@@ -5,10 +5,52 @@ from pathlib import Path
 from pydicom.dataset import FileDataset, FileMetaDataset
 from pydicom.uid import ExplicitVRLittleEndian, SecondaryCaptureImageStorage, generate_uid
 
-from server import find_tag, read_tags
+from server import dicom_files_in_folder, find_tag, read_tags
 
 
 class ReadTagsTests(unittest.TestCase):
+    def test_finds_dicom_files_recursively(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            nested_folder = folder / "nested"
+            nested_folder.mkdir()
+
+            for path in (folder / "first.dcm", nested_folder / "second.dcm"):
+                file_meta = FileMetaDataset()
+                file_meta.MediaStorageSOPClassUID = SecondaryCaptureImageStorage
+                file_meta.MediaStorageSOPInstanceUID = generate_uid()
+                file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+                file_meta.ImplementationClassUID = generate_uid()
+
+                dataset = FileDataset(
+                    path,
+                    {},
+                    file_meta=file_meta,
+                    preamble=b"\0" * 128,
+                )
+                dataset.PatientName = "Test^Patient"
+                dataset.save_as(path, little_endian=True, implicit_vr=False)
+
+            (folder / "not-dicom.txt").write_text("not a DICOM file")
+
+            self.assertEqual(
+                dicom_files_in_folder(str(folder)),
+                [
+                    {"path": str((folder / "first.dcm").resolve()), "filename": "first.dcm"},
+                    {
+                        "path": str((nested_folder / "second.dcm").resolve()),
+                        "filename": "second.dcm",
+                    },
+                ],
+            )
+
+    def test_dicom_files_in_folder_rejects_invalid_folder(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "missing"
+
+            with self.assertRaisesRegex(FileNotFoundError, "DICOM folder not found"):
+                dicom_files_in_folder(str(path))
+
     def test_reads_compliant_dicom_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "compliant.dcm"

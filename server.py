@@ -49,6 +49,60 @@ def _read_dataset(path: str) -> Dataset:
     _normalize_empty_numeric_values(dataset)
     return dataset
 
+def _is_dicom_file(path: Path) -> bool:
+    try:
+        pydicom.dcmread(path, stop_before_pixels=True)
+        return True
+    except InvalidDicomError:
+        try:
+            dataset = pydicom.dcmread(path, force=True, stop_before_pixels=True)
+            file_size = path.stat().st_size
+            for element in dataset._dict.values():
+                value_tell = getattr(element, "value_tell", None)
+                length = getattr(element, "length", None)
+                if (
+                    value_tell is not None
+                    and length is not None
+                    and length != 0xFFFFFFFF
+                    and value_tell + length > file_size
+                ):
+                    return False
+            return bool(dataset)
+        except (OSError, EOFError, InvalidDicomError, ValueError):
+            return False
+    except (OSError, EOFError, ValueError):
+        return False
+
+@mcp.tool(
+    title="Find DICOM Files in Folder",
+    description=(
+        "Recursively scan a local folder for DICOM files. Returns a sorted "
+        "list of objects containing each file's absolute path and filename. "
+        "Unreadable and non-DICOM files are skipped."
+    ),
+    annotations=ToolAnnotations(
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    ),
+    structured_output=True,
+)
+def dicom_files_in_folder(path: str) -> list[dict[str, str]]:
+    """Recursively find DICOM files and return their paths and filenames."""
+    folder = Path(path).expanduser()
+    if not folder.exists():
+        raise FileNotFoundError(f"DICOM folder not found: {folder}")
+    if not folder.is_dir():
+        raise NotADirectoryError(f"DICOM folder is not a directory: {folder}")
+
+    files = []
+    for file_path in sorted(folder.rglob("*")):
+        if file_path.is_file() and _is_dicom_file(file_path):
+            absolute_path = file_path.resolve()
+            files.append({"path": str(absolute_path), "filename": file_path.name})
+    return files
+
 @mcp.tool(
     title="Read DICOM Metadata",
     description=(

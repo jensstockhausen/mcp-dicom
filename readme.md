@@ -38,6 +38,18 @@ Run the unit tests with verbose output:
 
 ## Tool
 
+
+### `dicom_files_in_folder`
+
+Scans a folder recursively and returns a sorted list of DICOM files. Each
+result contains the file's absolute `path` and `filename`. Non-DICOM and
+unreadable files are skipped.
+
+```text
+dicom_files_in_folder(path="/path/to/folder")
+```
+
+
 ### `read_tags`
 
 Reads a DICOM file and returns its metadata as a JSON object. Pixel data is
@@ -60,6 +72,7 @@ The tag accepts compact hexadecimal notation such as `00100010`.
 ```text
 find_tag(path="/path/to/image.dcm", tag="00100010")
 ```
+
 
 ## MCP Inspector
 
