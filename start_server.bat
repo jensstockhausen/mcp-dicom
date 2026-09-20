@@ -2,4 +2,4 @@
 setlocal
 
 cd /d "%~dp0"
-uv run --locked python server.py
+uv run --locked python -m src.server

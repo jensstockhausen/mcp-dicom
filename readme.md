@@ -21,7 +21,7 @@ uv sync
 Start the server over stdio:
 
 ```bash
-uv run --locked python server.py
+uv run --locked python -m src.server
 ```
 
 The MCP host launches the process and calls the tool below.
@@ -105,7 +105,7 @@ https://dicom.nema.org/medical/dicom/current/
 Start inspector with
 
 ```
-uv run mcp dev server.py  
+uv run mcp dev src/server.py
 ````
 
 
@@ -114,7 +114,7 @@ uv run mcp dev server.py
 With Node.js and `npx` available, inspect the server interactively:
 
 ```bash
-npx @modelcontextprotocol/inspector uv run --locked python server.py
+npx @modelcontextprotocol/inspector uv run --locked python -m src.server
 ```
 
 The VS Code MCP configuration is in `.vscode/mcp.json`.

@@ -377,7 +377,7 @@ cli = [
 [[package]]
 name = "mcp-dicom"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "mcp", extra = ["cli"] },
     { name = "numpy" },

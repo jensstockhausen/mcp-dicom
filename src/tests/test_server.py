@@ -9,7 +9,7 @@ from pydicom.dataset import FileDataset, FileMetaDataset
 from pydicom.uid import ExplicitVRLittleEndian, SecondaryCaptureImageStorage, generate_uid
 from mcp.server.mcpserver.exceptions import ToolError
 
-from server import dicom_files_in_folder, find_tag, get_frame, read_tags
+from src.server import dicom_files_in_folder, find_tag, get_frame, read_tags
 
 
 class ReadTagsTests(unittest.TestCase):
