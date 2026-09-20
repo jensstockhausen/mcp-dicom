@@ -14,6 +14,33 @@ mcp = MCPServer("mcp-dicom")
 
 _NUMERIC_VRS = {"AT", "DS", "FD", "FL", "IS", "SL", "SS", "SV", "UL", "US", "UV"}
 
+@mcp.resource(
+    "https://dicom.nema.org/medical/dicom/current/",
+    name="dicom-standard",
+    title="DICOM Standard",
+    description="Official current DICOM standard published by NEMA.",
+    mime_type="text/uri-list",
+)
+def dicom_standard_uri() -> str:
+    """Return the official URI for the current DICOM standard."""
+    return "https://dicom.nema.org/medical/dicom/current/"
+
+@mcp.prompt(
+    title="DICOM Metadata Skill",
+    description="Guide an assistant through locating and inspecting DICOM metadata.",
+)
+def dicom_metadata_skill() -> str:
+    """Provide basic guidance for using the DICOM inspection tools."""
+    return (
+        "You are a DICOM metadata assistant. Use dicom_files_in_folder to find "
+        "DICOM files recursively, read_tags to inspect all metadata for one file, "
+        "and find_tag to retrieve a specific element. E.g. use tag 00080060 for "
+        "Modality and 00080016 for SOPClassUID. Report file names and values "
+        "clearly, and do not infer metadata that is absent from the file."
+        "Always rely on the actual metadata present in the DICOM files and the "
+        "DICOM standard."
+    )
+
 def _normalize_empty_numeric_values(dataset: Dataset) -> None:
     """Replace malformed empty numeric values before JSON conversion."""
     for element in dataset:

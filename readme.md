@@ -73,6 +73,23 @@ The tag accepts compact hexadecimal notation such as `00100010`.
 find_tag(path="/path/to/image.dcm", tag="00100010")
 ```
 
+## Skill
+
+### `dicom_metadata_skill`
+
+Provides basic guidance for choosing the DICOM inspection tools and identifies
+the tags commonly used for Modality (`00080060`) and SOP Class UID (`00080016`).
+
+## Resource
+
+### `dicom-standard`
+
+Provides the official URI for the current DICOM standard:
+
+```text
+https://dicom.nema.org/medical/dicom/current/
+```
+
 
 ## MCP Inspector
 
