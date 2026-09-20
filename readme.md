@@ -102,11 +102,12 @@ https://dicom.nema.org/medical/dicom/current/
 
 ## mcp[cli]
 
-Start inspector with
+Start the MCP Inspector with the root launcher so `src.server` is loaded as a
+package and its relative imports work correctly:
 
+```bash
+uv run mcp dev mcp_dev.py:mcp
 ```
-uv run mcp dev src/server.py
-````
 
 
 ## MCP Inspector
