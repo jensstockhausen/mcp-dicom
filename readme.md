@@ -71,6 +71,17 @@ The tag accepts compact hexadecimal notation such as `00100010`.
 find_tag(path="/path/to/image.dcm", tag="00100010")
 ```
 
+### `get_frame`
+
+Decodes one DICOM pixel frame and returns it as a base64-encoded JPEG, along
+with its shape, data type, and `image/jpeg` MIME type. Frame numbering starts
+at zero; single-frame files use frame `0`.
+
+```text
+get_frame(path="/path/to/image.dcm", frame=0)
+```
+
+
 ## Skill
 
 ### `dicom_metadata_skill`
@@ -87,6 +98,15 @@ Provides the official URI for the current DICOM standard:
 ```text
 https://dicom.nema.org/medical/dicom/current/
 ```
+
+
+## mcp[cli]
+
+Start inspector with
+
+```
+uv run mcp dev server.py  
+````
 
 
 ## MCP Inspector

@@ -1,9 +1,12 @@
 """MCP server for inspecting DICOM metadata."""
 
+import base64
+import io
 from collections.abc import Iterable
 from pathlib import Path
 
 import pydicom
+from PIL import Image
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag
 from mcp.server import MCPServer
@@ -187,6 +190,59 @@ def find_tag(path: str, tag: str) -> dict[str, object]:
         tag_key = f"{normalized_tag.group:04X}{normalized_tag.element:04X}"
         return {tag_key: element.to_json_dict(None, 1024)}
     except (OSError, TypeError, ValueError) as error:
+        raise ToolError(str(error)) from error
+
+@mcp.tool(
+    title="Get DICOM Frame",
+    description=(
+        "Decode one DICOM pixel frame and return it as a base64-encoded JPEG, "
+        "along with the frame shape and NumPy data type. Frame numbering starts "
+        "at zero."
+    ),
+    annotations=ToolAnnotations(
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    ),
+    structured_output=True,
+)
+def get_frame(path: str, frame: int = 0) -> dict[str, object]:
+    """Decode and return one DICOM pixel frame as a base64-encoded JPEG."""
+    try:
+        if not isinstance(frame, int) or isinstance(frame, bool):
+            raise TypeError("Frame must be a non-negative integer")
+        if frame < 0:
+            raise ValueError("Frame must be a non-negative integer")
+
+        file_path = Path(path).expanduser()
+        if not file_path.is_file():
+            raise FileNotFoundError(f"DICOM file not found: {file_path}")
+
+        dataset = pydicom.dcmread(file_path)
+        if "PixelData" not in dataset:
+            raise ValueError(f"DICOM file has no pixel data: {file_path}")
+
+        pixel_array = dataset.pixel_array
+        number_of_frames = int(getattr(dataset, "NumberOfFrames", 1))
+        if frame >= number_of_frames:
+            raise IndexError(
+                f"Frame {frame} is out of range; DICOM contains "
+                f"{number_of_frames} frame(s)"
+            )
+
+        selected_frame = pixel_array if number_of_frames == 1 else pixel_array[frame]
+        image = Image.fromarray(selected_frame)
+        jpeg_buffer = io.BytesIO()
+        image.save(jpeg_buffer, format="JPEG")
+        return {
+            "frame": frame,
+            "shape": list(selected_frame.shape),
+            "dtype": str(selected_frame.dtype),
+            "mime_type": "image/jpeg",
+            "data": base64.b64encode(jpeg_buffer.getvalue()).decode("ascii"),
+        }
+    except Exception as error:
         raise ToolError(str(error)) from error
 
 
