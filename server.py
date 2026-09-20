@@ -7,6 +7,7 @@ import pydicom
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag
 from mcp.server import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydicom.errors import InvalidDicomError
 
@@ -117,18 +118,21 @@ def _is_dicom_file(path: Path) -> bool:
 )
 def dicom_files_in_folder(path: str) -> list[dict[str, str]]:
     """Recursively find DICOM files and return their paths and filenames."""
-    folder = Path(path).expanduser()
-    if not folder.exists():
-        raise FileNotFoundError(f"DICOM folder not found: {folder}")
-    if not folder.is_dir():
-        raise NotADirectoryError(f"DICOM folder is not a directory: {folder}")
+    try:
+        folder = Path(path).expanduser()
+        if not folder.exists():
+            raise FileNotFoundError(f"DICOM folder not found: {folder}")
+        if not folder.is_dir():
+            raise NotADirectoryError(f"DICOM folder is not a directory: {folder}")
 
-    files = []
-    for file_path in sorted(folder.rglob("*")):
-        if file_path.is_file() and _is_dicom_file(file_path):
-            absolute_path = file_path.resolve()
-            files.append({"path": str(absolute_path), "filename": file_path.name})
-    return files
+        files = []
+        for file_path in sorted(folder.rglob("*")):
+            if file_path.is_file() and _is_dicom_file(file_path):
+                absolute_path = file_path.resolve()
+                files.append({"path": str(absolute_path), "filename": file_path.name})
+        return files
+    except (OSError, TypeError, ValueError) as error:
+        raise ToolError(str(error)) from error
 
 @mcp.tool(
     title="Read DICOM Metadata",
@@ -147,7 +151,10 @@ def dicom_files_in_folder(path: str) -> list[dict[str, str]]:
 )
 def read_tags(path: str) -> dict[str, object]:
     """Read all DICOM metadata except pixel data from a local file."""
-    return _read_dataset(path).to_json_dict()
+    try:
+        return _read_dataset(path).to_json_dict()
+    except (OSError, TypeError, ValueError) as error:
+        raise ToolError(str(error)) from error
 
 @mcp.tool(
     title="Find DICOM Tag",
@@ -169,15 +176,18 @@ def find_tag(path: str, tag: str) -> dict[str, object]:
     try:
         normalized_tag = Tag(tag)
     except (TypeError, ValueError) as error:
-        raise ValueError(f"Invalid DICOM tag: {tag}") from error
+        raise ToolError(f"Invalid DICOM tag: {tag}") from error
 
-    dataset = _read_dataset(path)
-    element = dataset.get(normalized_tag)
-    if element is None:
-        return {}
+    try:
+        dataset = _read_dataset(path)
+        element = dataset.get(normalized_tag)
+        if element is None:
+            return {}
 
-    tag_key = f"{normalized_tag.group:04X}{normalized_tag.element:04X}"
-    return {tag_key: element.to_json_dict(None, 1024)}
+        tag_key = f"{normalized_tag.group:04X}{normalized_tag.element:04X}"
+        return {tag_key: element.to_json_dict(None, 1024)}
+    except (OSError, TypeError, ValueError) as error:
+        raise ToolError(str(error)) from error
 
 
 def main() -> None:

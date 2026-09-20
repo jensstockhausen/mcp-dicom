@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pydicom.dataset import FileDataset, FileMetaDataset
 from pydicom.uid import ExplicitVRLittleEndian, SecondaryCaptureImageStorage, generate_uid
+from mcp.server.mcpserver.exceptions import ToolError
 
 from server import dicom_files_in_folder, find_tag, read_tags
 
@@ -48,7 +49,7 @@ class ReadTagsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "missing"
 
-            with self.assertRaisesRegex(FileNotFoundError, "DICOM folder not found"):
+            with self.assertRaisesRegex(ToolError, "DICOM folder not found"):
                 dicom_files_in_folder(str(path))
 
     def test_reads_compliant_dicom_file(self) -> None:
@@ -97,7 +98,7 @@ class ReadTagsTests(unittest.TestCase):
             self.assertEqual(find_tag(str(path), "00100020"), {})
 
     def test_find_tag_rejects_invalid_tag(self) -> None:
-        with self.assertRaisesRegex(ValueError, "Invalid DICOM tag"):
+        with self.assertRaisesRegex(ToolError, "Invalid DICOM tag"):
             find_tag("unused.dcm", "not-a-tag")
 
     def test_reads_non_compliant_dicom_file(self) -> None:
@@ -133,14 +134,14 @@ class ReadTagsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "missing.dcm"
 
-            with self.assertRaisesRegex(FileNotFoundError, "DICOM file not found"):
+            with self.assertRaisesRegex(ToolError, "DICOM file not found"):
                 read_tags(str(path))
 
-    def test_real_file(self) -> None:
-        # Replace 'path_to_real_dicom_file' with the actual path to a real DICOM file for testing
-        path = "/Users/jens/Develop/dicom/data/20140410152449000_2D.dcm"
-        tags = read_tags(path)
-        self.assertIn("00100010", tags)  # Check that the PatientName tag exists
+    #def test_real_file(self) -> None:
+    #    # Replace 'path_to_real_dicom_file' with the actual path to a real DICOM file for testing
+    #    path = "local/path/to/real_dicom_file.dcm"
+    #    tags = read_tags(path)
+    #    self.assertIn("00100010", tags)  # Check that the PatientName tag exists
 
 
 if __name__ == "__main__":

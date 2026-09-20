@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "MCP server for inspecting DICOM metadata"
 requires-python = ">=3.10"
 dependencies = [
-    "mcp==2.2.0",
+    "mcp[cli]==2.2.0",
     "pydicom==3.0.2",
 ]
 
