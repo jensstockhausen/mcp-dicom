@@ -6,4 +6,4 @@ This project uses the v2 MCP Python SDK.
 - MCP Python SDK repository: https://github.com/modelcontextprotocol/python-sdk
 - v2 changes and migration notes: https://py.sdk.modelcontextprotocol.io/whats-new/
 
-Keep dependencies in `requirements.txt` pinned to exact versions.
+Use the `uv` tool to run Python commands with the locked environment.

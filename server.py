@@ -180,5 +180,9 @@ def find_tag(path: str, tag: str) -> dict[str, object]:
     return {tag_key: element.to_json_dict(None, 1024)}
 
 
-if __name__ == "__main__":
+def main() -> None:
     mcp.run()
+
+
+if __name__ == "__main__":
+    main()

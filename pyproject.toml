@@ -1,0 +1,18 @@
+[project]
+name = "mcp-dicom"
+version = "0.1.0"
+description = "MCP server for inspecting DICOM metadata"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp==2.2.0",
+    "pydicom==3.0.2",
+]
+
+[dependency-groups]
+dev = []
+
+[project.scripts]
+mcp-dicom = "server:main"
+
+[tool.setuptools]
+py-modules = ["server"]

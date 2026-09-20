@@ -8,14 +8,12 @@ from local files without loading pixel data.
 ## Requirements
 
 - Python 3.10 or newer
-- The dependencies in `requirements.txt`
+- [uv](https://docs.astral.sh/uv/)
 
-Install the pinned dependencies in a virtual environment:
+Create the environment and install the locked dependencies:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
+uv sync
 ```
 
 ## Run
@@ -23,7 +21,7 @@ python -m pip install -r requirements.txt
 Start the server over stdio:
 
 ```bash
-python server.py
+uv run --locked python server.py
 ```
 
 The MCP host launches the process and calls the tool below.
@@ -96,7 +94,7 @@ https://dicom.nema.org/medical/dicom/current/
 With Node.js and `npx` available, inspect the server interactively:
 
 ```bash
-npx @modelcontextprotocol/inspector python server.py
+npx @modelcontextprotocol/inspector uv run --locked python server.py
 ```
 
 The VS Code MCP configuration is in `.vscode/mcp.json`.

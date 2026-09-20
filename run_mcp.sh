@@ -1,4 +1,4 @@
 #!/bin/bash
 
-npx @modelcontextprotocol/inspector python server.py
+npx @modelcontextprotocol/inspector uv run --locked python server.py
 
