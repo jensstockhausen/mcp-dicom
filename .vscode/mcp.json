@@ -3,7 +3,8 @@
     "mcp-dicom": {
       "type": "stdio",
       "command": "bash",
-      "args": ["${workspaceFolder}/start_server.sh"]
+      "args": ["${workspaceFolder}/start_server.bat"]
+      //"args": ["${workspaceFolder}/start_server.sh"] // Use this line if you want to run the server with the shell script instead of the batch file
     }
   }
 }
