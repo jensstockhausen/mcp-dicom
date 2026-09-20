@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "mcp-dicom": {
+      "type": "stdio",
+      "command": "bash",
+      "args": ["${workspaceFolder}/start_server.sh"]
+    }
+  }
+}
