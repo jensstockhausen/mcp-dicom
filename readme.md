@@ -16,16 +16,6 @@ Create the environment and install the locked dependencies:
 uv sync
 ```
 
-## Run
-
-Start the server over stdio:
-
-```bash
-uv run --locked python -m src.server
-```
-
-The MCP host launches the process and calls the tool below.
-
 ## Tests
 
 Run the unit tests with verbose output:
@@ -34,8 +24,37 @@ Run the unit tests with verbose output:
 ./run_tests.sh
 ```
 
-## Tool
 
+## Run
+
+Start the server over stdio:
+
+```bash
+uv run --locked python -m src.server
+```
+
+For convenience use the 
+```
+start_server.bat
+```
+Use this to configure the mcp in your IDE.
+
+## Skill
+
+### `dicom-metadata-skill`
+
+Provides basic guidance for choosing the DICOM inspection tools.
+Provided as separate [skill.md](./skill.md) file 
+
+For convenient use 
+```
+update_workspace_skill.bat 
+```
+to do the setup for copilote in the VSC.
+Do use this skill to strat the interaction wit DICOM files.
+e.g. `/dicom-metadata-skill find DICOM files in <path>`
+
+## Tools
 
 ### `dicom_files_in_folder`
 
@@ -46,6 +65,7 @@ unreadable files are skipped.
 ```text
 dicom_files_in_folder(path="/path/to/folder")
 ```
+The search is limited to 100 files.
 
 
 ### `read_tags`
@@ -82,13 +102,6 @@ get_frame(path="/path/to/image.dcm", frame=0)
 ```
 
 
-## Skill
-
-### `dicom-metadata-skill`
-
-Provides basic guidance for choosing the DICOM inspection tools.
-Provided as separate skill.md file
-
 ## Resource
 
 ### `dicom-standard`
@@ -100,7 +113,7 @@ https://dicom.nema.org/medical/dicom/current/
 ```
 
 
-## mcp[cli]
+## MCP Inspector
 
 Start the MCP Inspector with the root launcher so `src.server` is loaded as a
 package and its relative imports work correctly:
@@ -108,15 +121,3 @@ package and its relative imports work correctly:
 ```bash
 uv run mcp dev mcp_dev.py:mcp
 ```
-
-
-## MCP Inspector
-
-With Node.js and `npx` available, inspect the server interactively:
-
-```bash
-npx @modelcontextprotocol/inspector uv run --locked python -m src.server
-```
-
-The VS Code MCP configuration is in `.vscode/mcp.json`.
-
