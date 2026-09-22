@@ -10,3 +10,4 @@ dist/
 .DS_Store
 .idea/
 .vscode/settings.json
+.github/skills/dicom-metadata-skill/skill.md

@@ -80,6 +80,11 @@ When a user asks to view or display a DICOM frame:
 
 **Note:** Always provide clear context about what the user is viewing (imaging type, frame number, etc.).
 
+
+## Handling errors
+
+When the files or folder are not found by the mcp-dicom give the user the hint to try to set the path in **backticks** to ensure it is interpreted as a literal path.
+
 ---
 
 ## Workflow Example
