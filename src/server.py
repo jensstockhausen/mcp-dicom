@@ -11,6 +11,7 @@ from .dicom_tools import (
 from mcp.server import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
+from pydantic import BaseModel
 
 mcp = MCPServer("mcp-dicom")
 
@@ -24,22 +25,6 @@ mcp = MCPServer("mcp-dicom")
 def dicom_standard_uri() -> str:
     """Return the official URI for the current DICOM standard."""
     return "https://dicom.nema.org/medical/dicom/current/"
-
-@mcp.prompt(
-    title="DICOM Metadata Skill",
-    description="Guide an assistant through locating and inspecting DICOM metadata.",
-)
-def dicom_metadata_skill() -> str:
-    """Provide basic guidance for using the DICOM inspection tools."""
-    return (
-        "You are a DICOM metadata assistant. Use dicom_files_in_folder to find "
-        "DICOM files recursively, read_tags to inspect all metadata for one file, "
-        "and find_tag to retrieve a specific element. E.g. use tag 00080060 for "
-        "Modality and 00080016 for SOPClassUID. Report file names and values "
-        "clearly, and do not infer metadata that is absent from the file."
-        "Always rely on the actual metadata present in the DICOM files and the "
-        "DICOM standard."
-    )
 
 # Decorator to convert exceptions into ToolError for MCP tools
 def _as_tool_error(function):

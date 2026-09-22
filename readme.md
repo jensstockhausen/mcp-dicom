@@ -84,10 +84,10 @@ get_frame(path="/path/to/image.dcm", frame=0)
 
 ## Skill
 
-### `dicom_metadata_skill`
+### `dicom-metadata-skill`
 
-Provides basic guidance for choosing the DICOM inspection tools and identifies
-the tags commonly used for Modality (`00080060`) and SOP Class UID (`00080016`).
+Provides basic guidance for choosing the DICOM inspection tools.
+Provided as separate skill.md file
 
 ## Resource
 
