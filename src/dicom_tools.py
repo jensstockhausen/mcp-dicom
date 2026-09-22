@@ -12,6 +12,7 @@ from pydicom.errors import InvalidDicomError
 from pydicom.tag import Tag
 
 _NUMERIC_VRS = {"AT", "DS", "FD", "FL", "IS", "SL", "SS", "SV", "UL", "US", "UV"}
+_MAX_FILES_TO_PARSE = 100
 
 
 def _normalize_empty_numeric_values(dataset: Dataset) -> None:
@@ -85,8 +86,14 @@ def dicom_files_in_folder(path: str) -> list[dict[str, str]]:
         raise NotADirectoryError(f"DICOM folder is not a directory: {folder}")
 
     files = []
+    parsed_file_count = 0
     for file_path in sorted(folder.rglob("*")):
-        if file_path.is_file() and _is_dicom_file(file_path):
+        if not file_path.is_file():
+            continue
+        if parsed_file_count >= _MAX_FILES_TO_PARSE:
+            raise ValueError("File limit  of 100 reached, Search aborted")
+        parsed_file_count += 1
+        if _is_dicom_file(file_path):
             absolute_path = file_path.resolve()
             files.append({"path": str(absolute_path), "filename": file_path.name})
     return files

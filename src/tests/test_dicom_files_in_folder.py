@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from mcp.server.mcpserver.exceptions import ToolError
 
@@ -38,3 +39,18 @@ class DicomFilesInFolderTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ToolError, "DICOM folder not found"):
                 dicom_files_in_folder(str(path))
+
+    def test_aborts_after_100_files_are_parsed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            for index in range(101):
+                (folder / f"file-{index:03d}.txt").write_text("not a DICOM file")
+
+            with patch("src.dicom_tools._is_dicom_file", return_value=False) as is_dicom_file:
+                with self.assertRaisesRegex(
+                    ToolError,
+                    r"^File limit  of 100 reached, Search aborted$",
+                ):
+                    dicom_files_in_folder(str(folder))
+
+            self.assertEqual(is_dicom_file.call_count, 100)
